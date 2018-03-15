@@ -1,6 +1,8 @@
 module Providers
   class ExtManagementSystem < ApplicationRecord
     has_many :endpoints, :as => :resource, :dependent => :destroy, :autosave => true
+    has_many :hosts, :foreign_key => "ems_id", :class_name => "Providers::Infra::Host", :dependent => :nullify
+    has_many :vms,   :foreign_key => "ems_id", :class_name => "Providers::Infra::Vm", :dependent => :nullify
 
     validates :name,     :presence => true, :uniqueness => {:scope => [:tenant_id]}
     validates :hostname, :presence => true, :if => :hostname_required?
