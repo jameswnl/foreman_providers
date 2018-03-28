@@ -27,14 +27,7 @@ module Providers
         return if hashes.nil?
         target = ems if target.nil? && disconnect
         log_header = "EMS: [#{ems.name}], id: [#{ems.id}]"
-
-        disconnects = if disconnect && (target.kind_of?(ExtManagementSystem) || target.kind_of?(Host))
-                        target.vms_and_templates.reload.to_a
-                      elsif disconnect && target.kind_of?(Vm)
-                        [target.ruby_clone]
-                      else
-                        []
-                      end
+        disconnects = disconnect && target.try(:disconnects) || []
 
         child_keys       = [:operating_system, :hardware]
         extra_infra_keys = [:hardware, :custom_attributes, :snapshots, :advanced_settings, :labels, :tags, :host, :ems_cluster, :storage, :storages, :storage_profile, :raw_power_state, :parent_vm]
@@ -54,7 +47,7 @@ module Providers
 
         # Query for all of the Vms once across all EMSes, to handle any moving VMs
         vms_uids = hashes.collect { |h| h[:uid_ems] }.compact
-        vms = Infra::VmOrTemplate.where(:uid_ems => vms_uids).to_a
+        vms = Infra::VmOrTemplate.where(:uid_ems => vms_uids).to_a + Cloud::Instance.where(:uid_ems => vms_uids).to_a
         disconnects_index = disconnects.index_by { |vm| vm }
         vms_by_uid_ems = vms.group_by(&:uid_ems)
         dup_vms_uids = (vms_uids.duplicates + vms.collect(&:uid_ems).duplicates).uniq.sort
@@ -64,6 +57,8 @@ module Providers
         # Clear vms, so GC can clean them
         vms = nil
 
+        klass = hashes.first[:type].constantize
+        klass_col = klass.column_names.collect{|e| e.to_sym}
         ActiveRecord::Base.transaction do
           hashes.each do |h|
             # Backup keys that cannot be written directly to the database
@@ -108,13 +103,14 @@ module Providers
                 h[:location] = "unknown" if h[:location].blank?
 
                 # build a type-specific vm or template
-                found = ems.vms_and_templates.klass.new(h)
+                # found = ems.vms_and_templates.klass.new(h)
+                found = klass.new(h.slice(*klass_col))
               else
                 vms_by_uid_ems[h[:uid_ems]].delete(found)
                 h.delete(:type)
 
                 _log.info("#{log_header} Updating Vm [#{found.name}] id: [#{found.id}] location: [#{found.location}] storage id: [#{found.storage_id}] uid_ems: [#{found.uid_ems}] ems_ref: [#{h[:ems_ref]}]")
-                found.update_attributes!(h)
+                found.update_attributes!(h.slice(*klass_col))
                 disconnects_index.delete(found)
               end
 
@@ -194,7 +190,7 @@ module Providers
       end
 
       def save_operating_system_inventory(parent, hash)
-        return if hash.nil?
+        return if hash.nil? || !parent.respond_to?(:operating_system)
 
         # Only set a value if we do not have one and we have not collected scan metadata.
         # Otherwise an ems may not contain the proper value and we do not want to overwrite
@@ -205,7 +201,7 @@ module Providers
       end
 
       def save_hardware_inventory(parent, hash)
-        return if hash.nil?
+        return if hash.nil? || !parent.respond_to?(:hardware)
         save_inventory_single(:hardware, parent, hash, [:disks, :guest_devices, :networks, :firmwares])
         parent.save!
       end
