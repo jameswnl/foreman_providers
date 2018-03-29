@@ -17,8 +17,8 @@ Add the provider plugins to your Foreman bundler.d/ directory:
 ```bash
 echo 'gem "ovirt" # require the ovirt gem early to workaround issues with rbovirt
 gem "foreman_providers",      :path => "../foreman_providers"
-gem "foreman_providers_infra, :path => "../foreman_providers_infra"
-gem "foreman_providers_ovirt, :path => "../foreman_providers_ovirt"' > bundler.d/provider.rb
+gem "foreman_providers_infra", :path => "../foreman_providers_infra"
+gem "foreman_providers_ovirt", :path => "../foreman_providers_ovirt"' > bundler.d/provider.rb
 ```
 
 Update your foreman gems and database
