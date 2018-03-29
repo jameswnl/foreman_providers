@@ -10,6 +10,7 @@ module Providers
         hashes = hashes_or_collections
 
         save_ems_infra_inventory(ems, hashes, target, disconnect)
+        save_ems_cloud_inventory(ems, hashes, target, disconnect)
 
         # Handle updates to the ext_management_system
         update_attributes!(ems, hashes[:ems], [:type]) unless hashes[:ems].nil?
