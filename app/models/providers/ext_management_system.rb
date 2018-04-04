@@ -1,5 +1,6 @@
 module Providers
   class ExtManagementSystem < ApplicationRecord
+    belongs_to :compute_resource
     has_many :endpoints, :as => :resource, :dependent => :destroy, :autosave => true
 
     validates :name,     :presence => true, :uniqueness => {:scope => [:tenant_id]}
