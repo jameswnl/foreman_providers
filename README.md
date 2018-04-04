@@ -4,21 +4,25 @@ Adds ManageIQ Providers and Inventory to Foreman
 
 ## Installation
 
-Clone the provider plugins:
+The provider plugins are on GitHub here:
 
 ```bash
-git clone https://github.com/agrare/foreman_providers.git
-git clone https://github.com/agrare/foreman_providers_infra.git
-git clone https://github.com/agrare/foreman_providers_ovirt.git
+https://github.com/agrare/foreman_providers
+https://github.com/agrare/foreman_providers_infra
+https://github.com/agrare/foreman_providers_ovirt
+https://github.com/jameswnl/foreman_providers_cloud
+https://github.com/jameswnl/foreman_providers_openstack
 ```
 
 Add the provider plugins to your Foreman bundler.d/ directory:
 
 ```bash
 echo 'gem "ovirt" # require the ovirt gem early to workaround issues with rbovirt
-gem "foreman_providers",      :path => "../foreman_providers"
-gem "foreman_providers_infra", :path => "../foreman_providers_infra"
-gem "foreman_providers_ovirt", :path => "../foreman_providers_ovirt"' > bundler.d/provider.rb
+gem "foreman_providers",           :git => "https://github.com/agrare/foreman_providers"
+gem "foreman_providers_infra",     :git => "https://github.com/agrare/foreman_providers_infra"
+gem 'foreman_providers_cloud',     :git => "https://github.com/jameswnl/foreman_providers_cloud.git"
+gem "foreman_providers_ovirt",     :git => "https://github.com/agrare/foreman_providers_ovirt"
+gem "foreman_providers_openstack", :git => "https://github.com/jameswnl/foreman_providers_openstack"' > bundler.d/provider.rb
 ```
 
 Update your foreman gems and database
