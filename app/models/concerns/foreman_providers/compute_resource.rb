@@ -3,6 +3,7 @@ module ForemanProviders
     extend ActiveSupport::Concern
 
     included do
+      has_one :ems, class_name: 'Providers::ExtManagementSystem', foreign_key: 'compute_resource_id'
       after_create :create_provider
       before_destroy :destroy_provider
     end
@@ -13,6 +14,7 @@ module ForemanProviders
       ems = provider_klass.new(:name => name)
       ems.authentications << Providers::Authentication.new(:authtype => "default", :userid => user, :password => password)
       ems.endpoints       << Providers::Endpoint.new(:role => "default", :hostname => URI(url).host, :verify_ssl => 0)
+      ems.compute_resource = self
       ems.save!
     end
 
