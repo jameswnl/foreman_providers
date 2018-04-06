@@ -20,7 +20,7 @@ Add the provider plugins to your Foreman bundler.d/ directory:
 echo 'gem "ovirt" # require the ovirt gem early to workaround issues with rbovirt
 gem "foreman_providers",           :git => "https://github.com/agrare/foreman_providers"
 gem "foreman_providers_infra",     :git => "https://github.com/agrare/foreman_providers_infra"
-gem 'foreman_providers_cloud',     :git => "https://github.com/jameswnl/foreman_providers_cloud.git"
+gem "foreman_providers_cloud",     :git => "https://github.com/jameswnl/foreman_providers_cloud.git"
 gem "foreman_providers_ovirt",     :git => "https://github.com/agrare/foreman_providers_ovirt"
 gem "foreman_providers_openstack", :git => "https://github.com/jameswnl/foreman_providers_openstack"' > bundler.d/provider.rb
 ```
