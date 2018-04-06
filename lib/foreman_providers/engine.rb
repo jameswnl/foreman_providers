@@ -64,6 +64,7 @@ module ForemanProviders
     config.to_prepare do
       begin
         Foreman::Model::Ovirt.include(ForemanProviders::ComputeResource)
+        Foreman::Model::Openstack.include(ForemanProviders::ComputeResource)
       rescue => e
         Rails.logger.warn "ForemanProviders: skipping engine hook (#{e})"
       end
