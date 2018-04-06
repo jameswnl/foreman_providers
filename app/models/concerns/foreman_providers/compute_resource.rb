@@ -25,6 +25,8 @@ module ForemanProviders
       case type
       when "Foreman::Model::Ovirt"
         "Providers::Ovirt::Manager"
+      when "Foreman::Model::Openstack"
+        "Providers::Openstack::Manager"
       end
     end
   end
